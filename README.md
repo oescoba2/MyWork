@@ -5,4 +5,4 @@ in projects that test my ability to be able to make sense of the theory and make
 we have finished covering the graph theory and data structures chapter and are now working in implementing a linked-list program and a binary search tree. In Mathematical 
 analysis, we are covering linear analysis and getting into matrix properties, and so the concurrent lab projects are at the moment linear transformations and complexity
 analysis of matrix operations and linear system solving using LU decomposition. As more labs are done, I will add them and give detailed explanations within this file. Lab
-problems can be found at acme.byu.edu. Feel free to contact me for any question using form found at the bottom of my webpage. 
+problems can be found at acme.byu.edu. Feel free to contact me for any question using form found at the bottom of my webpage https://oescoba2.github.io. 

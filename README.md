@@ -28,3 +28,8 @@ This lab was intended to help me understand the syntax of working with files and
 ### Standard Library
 
 The lab was inteded in helping me understand the built-in functions of the Standard Library that Python comes with. The best part was to create a similuation of the popular British pub game Shut the Box. I was able to only beat it once but loved the part we got to program a game. I received a full 50/50 for this lab. 
+
+### Linked Lists
+
+This lab was intended in helping me practice more of my Python Object-Oriented Programming as well as introduce me on how to code a doubly-linked list and then implement a deque. We were also asked to implement unit-tests for our code
+on a separate file. But I added some further just to ensure it worked fine. I received a 45/50 on this one as it failed one test case. 

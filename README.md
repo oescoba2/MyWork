@@ -20,7 +20,7 @@ The homework problems were to create a memoized, tabular, and naive method for c
 
 The last homework problem was to create a bottom-up and greedy approach to the minimal number of coins, in a given coin system, needed to complete a given amount of change (i.e. how many coins would be needed for a change of x-cents). I was able to produce a greedy algorithm as well as bottom up algorithm. We were not asked on memoization since that was a given example in the textbook. I did not work on returning the list of coins used since this was the problem I had troubles with that and cared more for understanding the concept of how to dynamically program theses and work on that and then if I had time afterwards comeback and implement the second half. 
 
-## hw_4_5_coding (Vol 2)
+### hw_4_5_coding (Vol 2)
 This algorithm was intended to solve a {0,1} (that is either you take one or zero of an item) knapsack problem of n-items with given weights (w1,...,wn) and values (v1,...,vn). The code returns the maximum number of items that can be placed into the knapsack given a weight limit W. I had fun working on this logic. It was rather difficult, but I was able to help others learn from my example since I coded the problem with the guidance of the TA in just ensuring I was incorporating all cases. The code does assume that the given items will be unique, so there are no repeats. I was going to account for possible repeats of an item (with a different weight) but the autograder only needed the case for unique items. 
 
 ## Labs

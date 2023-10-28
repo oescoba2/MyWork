@@ -36,3 +36,7 @@ The lab was inteded in helping me understand the built-in functions of the Stand
 
 This lab was intended in helping me practice more of my Python Object-Oriented Programming as well as introduce me on how to code a doubly-linked list and then implement a deque. We were also asked to implement unit-tests for our code
 on a separate file. But I added some further just to ensure it worked fine. I received a 45/50 on this one as it failed one test case. 
+
+### Binary Search Trees
+
+I very much enjoyed this lab. The lab was intended to help me learn to code a BST tree using some recursive techniques for searching and inserting nodes. It also helped me learn the difference in time complexities of BST vs. AVL vs. Singly Linked Lists. This one tested more of my knowledge about programming thus far as well as comprehension of recursion. I received a 50/50

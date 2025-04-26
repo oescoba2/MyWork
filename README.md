@@ -8,27 +8,40 @@ I love football (i.e. soccer) and am a huge fan of Real Madrid.
 In my spare time, I like to cook, watch series and movies, play the piano and guitar, and learn new things.
 
 Feel free to contact me for any question using form found at the bottom of my [website](https://oescoba2.github.io.).
-I give a breakdown of each directory in this repo and the contents therein in a TL;DR format.
-I also have pictures of some of the major projects in each directory.
+I give a breakdown of the contents therein in a TL;DR format.
+I also add some pictures or animations for quicker understanding of the results.
 
+Directories:
+* [Modeling_data](#modeling_data): this contains projects where I applied ML, Time Series Analysis, or deep learning in order to model with data and uncertainty.
+* [OTC_Dynamics](#otc_dynamics): contains some of the projects where I modeled using dynamics and then applied optimal control theory (OTC).
+* [DRL](#drl): contains my work in implementing deep reinforcement learning (DRL) research in order to learn and apply it.
+* [DA](#da): contains the work for the data assimilation projects I have worked with.
+* [Coursework](#coursework): This directory contains some of the cool homeworks, labs, or small projects I did as part of the classes I took at BYU.
 
 # Modeling_data 
-This directory contains some of the projects I have undertaken where I applied ML, Time Series, or deep learning in order to model with data and uncertainty.
 
-# OTC_Dyanmics
-This directory contains some of the projects where I modeled using dynamics and then applied optimal control theory (OTC).
+
+# OTC_Dynamics
+
 
 # DRL
-This directory contains my work in implementing deep reinforcement learning (DRL) in order to learn and apply it.
+My friend Justin and professor Dr. Grimsmann got me hooked into RL.
 I am happy to say I authored about 85% of the RL labs in ACME.
+I started off with DQN and coded up DDQN and dueling architecture following DeepMind's architecture and process.
+
+Here is my agent after 4000 episodes using Google Colab's TPU.
+
+![dqn](DRL/breakout_dqn.gif)
 
 # DA
-This directory contains the work for the data assimilation projects I have worked with.
+* particle filter: I worked on particle filter to track 2D submarine in fluid flow with my friends Joseph and Abe.
+The goal is to pinpoint the true position based off of a noisy pinged observed position.
 
+Here is visual of my particle filter project.
 ![particles](DA/particle_filter.gif)
 
 # Coursework
-This directory contains some of the cool homeworks or labs I did as part of the classes I took at BYU.
+The contents in this directory comprise:
 
 * HW4_1.py: this were several problems where I applied dynamic programming principles to do my homework.
 * HW4_5.py: This algorithm was intended to solve a {0,1} (that is either you take one or zero of an item) knapsack problem of n-items with given weights (w1,...,wn) and values (v1,...,vn)

@@ -1,16 +1,15 @@
-# My Work
-
+# About Me
 Oh, howdy there! 
 Glad you made it here.
 In this little corner of the internet, I host some the projects I have worked on or are currently working on.
-Feel free to contact me for any question using form found at the bottom of my [website](https://oescoba2.github.io.).
-I give a breakdown of each directory in this repo and the contents therein in a TL;DR format.
-I also have pictures of some of the major projects in each directory.
 
-# About Me
 I am Oscar J. Escobar and are about to finish the Applied and Computational Mathematics (ACME) degree at Brigham Young University (BYU) this December.
 I love football (i.e. soccer) and am a huge fan of Real Madrid.
 In my spare time, I like to cook, watch series and movies, play the piano and guitar, and learn new things.
+
+Feel free to contact me for any question using form found at the bottom of my [website](https://oescoba2.github.io.).
+I give a breakdown of each directory in this repo and the contents therein in a TL;DR format.
+I also have pictures of some of the major projects in each directory.
 
 
 # Modeling_data 

@@ -25,6 +25,8 @@ I am happy to say I authored about 85% of the RL labs in ACME.
 # DA
 This directory contains the work for the data assimilation projects I have worked with.
 
+![particles](DA/particle_filter.gif)
+
 # Coursework
 This directory contains some of the cool homeworks or labs I did as part of the classes I took at BYU.
 

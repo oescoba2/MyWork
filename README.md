@@ -7,7 +7,7 @@ I am Oscar J. Escobar and are about to finish the Applied and Computational Math
 I love football (i.e. soccer) and am a huge fan of Real Madrid.
 In my spare time, I like to cook, watch series and movies, play the piano and guitar, and learn new things.
 
-Feel free to contact me for any question using form found at the bottom of my [website](https://oescoba2.github.io.).
+Feel free to contact me for any question using the form found at the bottom of my [website](https://oescoba2.github.io.).
 I give a breakdown of the contents therein in a TL;DR format.
 I also add some pictures or animations for quicker understanding of the results.
 
@@ -18,6 +18,18 @@ Directories:
 * [DA](#da): contains the work for the data assimilation projects I have worked with.
 * [Coursework](#coursework): This directory contains some of the cool homeworks, labs, or small projects I did as part of the classes I took at BYU.
 
+If any of work was useful to you, please cite this using
+```
+@misc{OscarRepo,
+author={Óscar J. Escobar},
+year={2025},
+title={My Work},
+url={https://github.com/oescoba2/MyWork},
+accessed={},
+}
+```
+
+
 # Modeling_data 
 
 
@@ -25,13 +37,13 @@ Directories:
 
 
 # DRL
+
+* DQN: I coded Google DeepMind's DQN using DDQN and dueling architecture in PyTorch.
+This was to help me write the DQN lab for ACME.
 My friend Justin and professor Dr. Grimsmann got me hooked into RL.
-I am happy to say I authored about 85% of the RL labs in ACME.
-I started off with DQN and coded up DDQN and dueling architecture following DeepMind's architecture and process.
+Here is my agent after 5000 episodes of training using Google Colab's TPU.
 
-Here is my agent after 4000 episodes using Google Colab's TPU.
-
-![dqn](DRL/breakout_dqn.gif)
+![dqn](DRL/DQN/breakout_dqn.gif)
 
 # DA
 * particle filter: I worked on particle filter to track 2D submarine in fluid flow with my friends Joseph and Abe.

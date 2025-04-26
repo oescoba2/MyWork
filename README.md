@@ -31,7 +31,9 @@ accessed={},
 
 
 # Modeling_data 
-
+* Happiness: this a semester long project where I used mutual information, Random Forests, and XGBoost to predict a country's happiness index.
+I worked with my friend Joseph and Henry.
+Data was retrieved from the WorldBank.
 
 # OTC_Dynamics
 
@@ -45,12 +47,20 @@ Here is my agent after 5000 episodes of training using Google Colab's TPU.
 
 ![dqn](DRL/DQN/breakout_dqn.gif)
 
+* PolicyGrad: I am currently working on bringing a policy gradient lab where students can learn about policy gradients and work up to PPO and SAC.
+Stay tuned.
+
 # DA
+* LA Housing: This was a simple model that I did for LA housing for a small project that Dr. Barker gave us for class. 
+It utilizes the Kalman filter.
+Time series data was obtained from Federal Reserve Bank of St. Louis (available online).
+
 * particle filter: I worked on particle filter to track 2D submarine in fluid flow with my friends Joseph and Abe.
 The goal is to pinpoint the true position based off of a noisy pinged observed position.
 
 Here is visual of my particle filter project.
 ![particles](DA/particle_filter.gif)
+
 
 # Coursework
 The contents in this directory comprise:

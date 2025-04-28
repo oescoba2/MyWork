@@ -52,7 +52,7 @@ But the chemo is not properly modeled as learned.
 I will be going back to this project.
 The GIF below shows the dynamics we modeling with Michaelis Menten Kinetics (MMK).
 
-![idc](./OTC_Dyanmics/system_dynamics.gif)
+![idc](./OTC_Dynamics/system_dynamics.gif)
 
 # DRL
 

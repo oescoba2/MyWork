@@ -46,6 +46,13 @@ Our mutual information and random forest regressor had some great results.
 
 # OTC_Dynamics
 
+* IDC: this was a year long project where we first learned to model breast cancer under the effects of chemotherapy and immunological response then applied OTC to Invasive Ductal Carcinoma (IDC) and the AC treatment. 
+We were able to find an optimal control that appears to adhere to bang-bang solutions that are expected in chemo OTC.
+But the chemo is not properly modeled as learned.
+I will be going back to this project.
+The GIF below shows the dynamics we modeling with Michaelis Menten Kinetics (MMK).
+
+![idc](./OTC_Dyanmics/system_dynamics.gif)
 
 # DRL
 

@@ -31,9 +31,18 @@ accessed={},
 
 
 # Modeling_data 
-* Happiness: this a semester long project where I used mutual information, Random Forests, and XGBoost to predict a country's happiness index.
-I worked with my friend Joseph and Henry.
+* Climate change: another semester long project where we did some time series analysis to determine the effects of climate change on vegetation measurements.
+Data was retrieved from NOAA and World Bank as well as NASA.
+Our ARMA models were really well in predicting weather patterns.
+
+* Cancer & Unet: this was a weekly lab where I was tasked with implementing a modified UNet to detect cancer.
+I was able to achieve 90% accuracy on my UNet implementation.
+
+* Happiness: this a semester long project where we used mutual information, Random Forests, and XGBoost to predict a country's happiness index.
 Data was retrieved from the WorldBank.
+Our mutual information and random forest regressor had some great results.
+
+![happiness](./Modeling_Data/happiness.jpg)
 
 # OTC_Dynamics
 

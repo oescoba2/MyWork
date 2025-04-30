@@ -12,11 +12,12 @@ I give a breakdown of the contents therein in a TL;DR format.
 I also add some pictures or animations for quicker understanding of the results.
 
 Directories:
+* [Coursework](#coursework): This directory contains some of the cool homeworks, labs, or small projects I did as part of the classes I took at BYU.
+* [DA](#da): contains the work for the data assimilation projects I have worked with.
+* [DRL](#drl): contains my work in implementing deep reinforcement learning (DRL) research in order to learn and apply it.
 * [Modeling_data](#modeling_data): this contains projects where I applied ML, Time Series Analysis, or deep learning in order to model with data and uncertainty.
 * [OTC_Dynamics](#otc_dynamics): contains some of the projects where I modeled using dynamics and then applied optimal control theory (OTC).
-* [DRL](#drl): contains my work in implementing deep reinforcement learning (DRL) research in order to learn and apply it.
-* [DA](#da): contains the work for the data assimilation projects I have worked with.
-* [Coursework](#coursework): This directory contains some of the cool homeworks, labs, or small projects I did as part of the classes I took at BYU.
+* [Notes](#notes): I will be putting in the notes and things I learn as I try to implement research papers or other material  related to the content of the of the directories in this repo. I learn better as I summarize and pretend that I will teach someone. So the notes will sound like a summary but at the same time as a sort of lecture. Notes will be split into subdirectories like my content.
 
 If any of work was useful to you, please cite this using
 ```
@@ -84,3 +85,5 @@ The contents in this directory comprise:
 * HW4_1.py: this were several problems where I applied dynamic programming principles to do my homework.
 * HW4_5.py: This algorithm was intended to solve a {0,1} (that is either you take one or zero of an item) knapsack problem of n-items with given weights (w1,...,wn) and values (v1,...,vn)
 * binary_trees.py: I very much enjoyed this lab. The lab was intended to help me learn to code a BST tree using some recursive techniques for searching and inserting nodes. It also helped me learn the difference in time complexities of BST vs. AVL vs. Singly Linked Lists. This one tested more of my knowledge about programming thus far as well as comprehension of recursion. I received a 50/50
+
+# Notes

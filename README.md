@@ -16,7 +16,7 @@ Directories:
 * [DA](#da): contains the work for the data assimilation projects I have worked with.
 * [DRL](#drl): contains my work in implementing deep reinforcement learning (DRL) research in order to learn and apply it.
 * [Modeling_data](#modeling_data): this contains projects where I applied ML, Time Series Analysis, or deep learning in order to model with data and uncertainty.
-* [OTC_Dynamics](#otc_dynamics): contains some of the projects where I modeled using dynamics and then applied optimal control theory (OTC).
+* [OTC_Dynamics](#otc_dynamics): contains some of the projects where I modeled using dynamics and then, if applicable, applied optimal control theory (OTC).
 * [Notes](#notes): I will be putting in the notes and things I learn as I try to implement research papers or other material  related to the content of the of the directories in this repo. I learn better as I summarize and pretend that I will teach someone. So the notes will sound like a summary but at the same time as a sort of lecture. Notes will be split into subdirectories like my content.
 
 If any of work was useful to you, please cite this using
@@ -54,6 +54,11 @@ I will be going back to this project.
 The GIF below shows the dynamics we modeling with Michaelis Menten Kinetics (MMK).
 
 ![idc](./OTC_Dynamics/system_dynamics.gif)
+
+* BYU Hybrid Team: This was the first research group I ever joined. 
+We were tasked with designing a hybrid rocket where I worked in the propulsion unit.
+I specifically used the method of characteristics to help create code to design a bell shaped nozzle and calculate the mach number of the propulsion.
+
 
 # DRL
 My friend Justin and professor Dr. Grimsmann got me hooked into RL.

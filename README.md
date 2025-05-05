@@ -56,16 +56,31 @@ The GIF below shows the dynamics we modeling with Michaelis Menten Kinetics (MMK
 ![idc](./OTC_Dynamics/system_dynamics.gif)
 
 # DRL
+My friend Justin and professor Dr. Grimsmann got me hooked into RL.
 
 * DQN: I coded Google DeepMind's DQN using DDQN and dueling architecture in PyTorch.
 This was to help me write the DQN lab for ACME.
-My friend Justin and professor Dr. Grimsmann got me hooked into RL.
 Here is my agent after 5000 episodes of training using Google Colab's TPU.
+My goal is to expand all the way to Rainbow and R2D2.
 
 ![dqn](DRL/DQN/breakout_dqn.gif)
 
 * PolicyGrad: I am currently working on bringing a policy gradient lab where students can learn about policy gradients and work up to PPO and SAC.
-Stay tuned.
+So far, I have implemented VPG with GAE and actor-critic (as outlined by OpenAI in [here](https://spinningup.openai.com/en/latest/algorithms/vpg.html)). I will be working towards PPO but placing the motivation from natural gradient $\to$ TRPO $\to$ PPO.
+
+Here are some of my results (GIFs have been slowed down)
+
+Training Episode 0
+
+![humanoid](DRL/policyGradient/imgs/humanoid-vpg-train-episode0.gif)
+
+Training Episode 60K (Learning to land with legs straight )
+
+![humanoid60](DRL/policyGradient/imgs/humanoid-vpg-train-episode60000.gif)
+
+Testing after 60K episodes (First step, sort of)
+
+![humanoidTest](DRL/policyGradient/imgs/humanoid-vpg-stocTest-episode4.gif)
 
 # DA
 * LA Housing: This was a simple model that I did for LA housing for a small project that Dr. Barker gave us for class. 

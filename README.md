@@ -62,6 +62,7 @@ I specifically used the method of characteristics to help create code to design 
 
 # DRL
 My friend Justin and professor Dr. Grimsmann got me hooked into RL.
+I added the most recent packages I used to run these algorithms in requirements.txt.
 
 * DQN: I coded Google DeepMind's DQN using DDQN and dueling architecture in PyTorch.
 This was to help me write the DQN lab for ACME.

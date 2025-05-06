@@ -1,14 +1,17 @@
+from agent import QNetwork
 from collections import deque, namedtuple
 from gymnasium.wrappers import AtariPreprocessing, FrameStackObservation, RecordEpisodeStatistics, RecordVideo
 from numpy.typing import ArrayLike
 from torch import nn
 from tqdm import tqdm
+from warnings import warn
 
 import ale_py
 import gymnasium as gym
 import numpy as np
 import os
 import pickle
+import time
 import torch
 import random
 import re
@@ -20,30 +23,30 @@ class UniformReplay:
     experiences from a reinforcement learning environment.
 
     Attributes:
-        - buffer_min_size (int): the minimum size the buffer must
-                                 be for sampling.
+        - buffer_min_size (int) : the minimum size the buffer must
+                                  be for sampling.
 
     Methods:
-        - add(): Adds an experience to the memory buffer.
-        - initialize(): Initializes the memory to a given size.
-        - sample(): Samples a batch of experiences from the memory 
-                    buffer.
-        - save(): Saves the replay buffer for later use.
+        - add() : Adds an experience to the memory buffer.
+        - initialize() : Initializes the memory to a given size.
+        - sample() : Samples a batch of experiences from the memory 
+                     buffer.
+        - save() : Saves the replay buffer for later use.
 
     Hidden Methods:
-       _ __init__(): the constructor of the class. Creates the
+       _ __init__() : the constructor of the class. Creates the
                      capacity attribute.
-       - __len__(): allows the use of the len() function.
+       - __len__() : allows the use of the len() function.
     """
 
     def __init__(self, capacity:int, min_size:int) -> None:
         """Create the memory buffer as an attribute.
 
         Parameters:
-            - capacity (int): The maximum number of experiences to store
-                              in the memory buffer.
-            - min_size (int): the desired size the memory buffer should
-                              be before random sampling is available
+            - capacity (int) : The maximum number of experiences to store
+                               in the memory buffer.
+            - min_size (int) : the desired size the memory buffer should
+                               be before random sampling is available
         
         Returns:
             None
@@ -56,7 +59,8 @@ class UniformReplay:
         """Save an experience e_t to memory.
         
         Parameters:
-            - *args: any number of arguments. These will be unpacked
+            - *args : any number of arguments. These will be unpacked when
+                      placed into namedtuple Experience.
 
         Returns:
             None
@@ -71,7 +75,7 @@ class UniformReplay:
         to desired size.
 
         Parameters:
-            - env (gym.Env): the environment being simulated
+            - env (gym.Env) : the environment being simulated
 
         Returns:
             None
@@ -108,14 +112,14 @@ class UniformReplay:
         e_t = (s_t, a_t, s_{t+1}, r_{t+1}, terminated) from memory.
 
         Parameters:
-            - batch_size (int): The number of experiences to sample.
+            - batch_size (int) : The number of experiences to sample.
 
         Returns:
-            - (list[ArrayLike, ...]): a list of np.arrays containing
-                                     the states, actions, next states,
-                                     rewards, and terminations for
-                                     each experience sampled (in that
-                                     order).
+            - (list[ArrayLike]) : a list of 5 ArrayLike objects 
+                                  containing the states, actions, 
+                                  next states, rewards, and 
+                                  terminations for each experience 
+                                  sampled (in that order).
         """
 
         if len(self.buffer) == 0:
@@ -130,15 +134,16 @@ class UniformReplay:
 
         return sampled_experiences
 
-    def save(self, drl_directory:str) -> None:
+    def save(self, drl_directory:str, episode:int) -> None:
         """Save the replay buffer to a file using pickle.
 
         Parameters:
             - drl_directory (str): The directory on where to store
-                                   the pickle file
+                                   the pickle file.
+            - 
         """
 
-        filename = 'replay_buffer.pickle'
+        filename = 'replay_buffer_episode' + str(episode) + '.pickle'
         filepath = os.path.join(drl_directory, filename)
 
         with open(filepath, 'wb') as f:
@@ -149,8 +154,6 @@ class UniformReplay:
                 'min_size': self.buffer_min_size,
                 'capacity': self.buffer.maxlen
             }, f)
-            
-        print(f"Replay buffer saved to {filepath}.")
 
     def __len__(self) -> int:
         """Enables the use of len() function.
@@ -164,7 +167,7 @@ class UniformReplay:
 
         return len(self.buffer)
 
-def make_env(vid_dir:str, game:str='BreakoutNoFrameskip-v4', vid_name_prefix:str='drl-train-video', recording_freq:int=2_000) -> gym.Env|None:
+def get_env(vid_dir:str, game:str='BreakoutNoFrameskip-v4', vid_name_prefix:str='Qnet-train-video', recording_freq:int=2_500) -> gym.Env|None:
   """Make and preprocess the environment (i.e. game emulator) as
   outlined by the DeepMind 'Human-level control through deep
   reinforcement learning' paper. This includes the phi-function
@@ -179,8 +182,8 @@ def make_env(vid_dir:str, game:str='BreakoutNoFrameskip-v4', vid_name_prefix:str
     - vid_name_prefix (str): The prefix to use for the video
                              files. Defaulted to 'drl-train-video'.
     - recording_freq (int): The episode frequency at which to
-                            record videos. Defaulted to 2_000
-                            (i.e. record every 2_000 episodes)
+                            record videos. Defaulted to 2_500
+                            (i.e. record every 2_500 episodes)
 
   Returns:
     - env (gym.Env): The preprocessed environment.
@@ -199,7 +202,7 @@ def make_env(vid_dir:str, game:str='BreakoutNoFrameskip-v4', vid_name_prefix:str
   # Preprocess
   env = RecordEpisodeStatistics(env)
   env = RecordVideo(env, video_folder=vid_dir, name_prefix=vid_name_prefix,
-                    episode_trigger=lambda x: (x % recording_freq) == 0 or (x == recording_freq - 1))
+                    episode_trigger=lambda x: (x % recording_freq) == 0)
   env = AtariPreprocessing(env, noop_max=30, frame_skip=4, screen_size=84, 
                             grayscale_obs=True)
   env = FrameStackObservation(env, stack_size=4)
@@ -233,108 +236,134 @@ def get_epsilon(episode_num:int, num_episodes_decay:int=int(6e5), epsilon_start:
 
     return max(epsilon_start - slope * episode_num, epsilon_min)
 
-def get_weights(dir:str, device:torch.device) -> dict|None:
-    """Find the most recent model file based on episode number
-    and return the weights. This returns None if there are no
-    files from where weights can be extracted.
+def get_weights_buffer(dir:str, device:torch.device, get_buffer:bool=True) -> dict|None:
+    """Find the most recent trained model weights based on episode 
+    number as well as the replay buffer, if specified. This returns
+    None if there are no files from where weights can be extracted 
+    as well as the buffer.
     
     Parameters:
         - dir (str) : the directory to search for the weights
-                      file.
-        - device (torch.device): the device tag indicating whe-
-                                 re to load to load the tensor
+                      and replay buffer files.
+        - device (torch.device): the device tag indicating where
+                                 to load to load the tensor of
+                                 weights.
+        - get_buffer (bool) : whether to find and return the replay
+                              buffer. Defaulted to False.
         
     Returns:
-        - weights (dict): the ordered dictionary (from collect-
-                          ions) specifying the weights for each 
-                          parameter of the Q-network. 
+        - (dict) : When get_buffer is True, the return is a 
+                   dictionary whose keys are 'weights' and 'buffer'
+                   and the values are the Q-network weights and
+                   the replay buffer; otherwise None is returned
+                   if any of these files is not able to be found. 
+                   When get_buffer is False, the return is an 
+                   ordered dictionary of the Q-network weights; 
+                   otherwise the return is None if no weights 
+                   file can be found.
     """
     
-    files = os.listdir(dir)
-    episode_files = [(f, int(re.search(r"_episode(\d+)", f).group(1)))
-                     for f in files if re.search(r"_episode(\d+)", f)]
-    
-    if not episode_files:
-        return None
-    
-    latest_file = max(episode_files, key=lambda x: x[1])[0]
-    path = os.path.join(dir, latest_file)
-    weights = torch.load(path, map_location=device)
+    if get_buffer:
+        files = os.listdir(dir)
+        weights_files = [(f, int(re.search(r"_episode(\d+)", f).group(1))) for f in files if f.startswith("Qnet_weights") and re.search(r"_episode(\d+)", f)]
+        buffer_files = [(f, int(re.search(r"_episode(\d+)", f).group(1))) for f in files if f.startswith("replay_buffer") and re.search(r"_episode(\d+)", f)]
+        
+        if not weights_files or not buffer_files:
+            return None
+        
+        latest_weight = max(weights_files, key=lambda x: x[1])
+        latest_buffer = max(buffer_files, key=lambda x: x[1])
 
-    return weights
+        if latest_weight[1] != latest_buffer[1]:
+            warn(f"Saved weights and replay buffer are from different episodes!\nWeights episode: {latest_weight[1]}\nBuffer episode: {latest_buffer[1]}")
+            time.sleep(1.5)
 
-def load_buffer(dir:str) -> UniformReplay:
-    """Load the replay buffer from a file with saved experiences.
-    
-    Parameters:
-        - dir (str) : the directory for where to look for the 
-                      pickle file storing the replay buffer.
+        weight_path = os.path.join(dir, latest_weight[0])
+        weights = torch.load(weight_path, map_location=device)
 
-    Returns:
-        - buffer (Memory): a Memory object acting as the replay
-                           buffer
-    """
+        buffer_path = os.path.join(dir, latest_buffer[0])
+        with open(buffer_path, 'rb') as f:
+            data = pickle.load(f)
+        buffer = UniformReplay(capacity=data['capacity'], min_size=data['min_size'])
+        buffer.buffer = deque(data['buffer'], maxlen=data['capacity'])
 
-    filepath = os.path.join(dir, 'replay_buffer.pickle')
-    
-    if not os.path.exists(filepath):
-        raise FileNotFoundError(f"Buffer file not found: {filepath}")
-    
-    with open(filepath, 'rb') as f:
-        data = pickle.load(f)
-    
-    # Reconstruct the buffer
-    buffer = UniformReplay(capacity=data['capacity'], min_size=data['min_size'])
-    buffer.buffer = deque(data['buffer'], maxlen=data['capacity'])
-    print(f"Replay buffer loaded from {filepath}.")
-    
-    return buffer
+        return {'weights':weights, 'buffer':buffer}
 
-def test_agent(net:nn.Module, env:gym.Env, device:torch.device, weights_dir:str, uses_dueling:bool=False, num_test_episodes:int=10) -> None:
+    else: 
+        files = os.listdir(dir)
+        weights_files = [(f, int(re.search(r"_episode(\d+)", f).group(1))) for f in files if f.startswith("Qnet_weights") and re.search(r"_episode(\d+)", f)]
+
+        if not weights_files:
+            return None
+        
+        latest_weight = max(weights_files, key=lambda x: x[1])[0]
+        weight_path = os.path.join(dir, latest_weight)
+        weights = torch.load(weight_path, map_location=device)
+
+        return weights
+
+def test_agent(net:QNetwork, game:str, device:torch.device, weights_dir:str, vid_dir:str, uses_dueling:bool=False, 
+               num_test_episodes:int=2, vid_prefix:str='Qnet-test-video', test_recording_freq:int=1) -> None:
     """Test a trained agent by running episodes in the environment 
     using the learned policy.
     
     Parameters:
-        - net (nn.Module) : the network/agent class to evaluate.
-        - env (gym.Env) : The environment to test in.
-        - device (torch.device) : the device tag indicating whe-
-                                  re to load to load the tensor
+        - net (QNetwork) : the network/agent class to evaluate.
+                           Note that this is the class and not
+                           the object/instance.
+        - game (str) : The str id of the  environment to test the 
+                       agent on.
+        - device (torch.device) : the device tag indicating where
+                                  to load to load the tensor.
         - weights_dir (str) : the directory where to search for 
                               the network weights.
+        - vid_dir (str) : the directory to store the created videos.
         - uses_dueling (bool) : whether the given network uses
                                 dueling architecture. Defaulted
                                 to False.
         - num_test_episodes (int) : Number of episodes to run for 
-                                   testing. Defaulted to 100.
+                                    testing. Defaulted to 100.
+        - vid_prefix (str) : the prefix to give to the created 
+                             videos. Default is 'Qnet-test-video'.
+        - test_recording_freq (str) : the number of episodes that 
+                                      must pass before the next 
+                                      episode is recorded. Defaulted
+                                      to 1.
                                    
     Returns:
         - None
     """
 
     # Create model
-    Qnetwork = net(env.observation_space, env.action_space, dueling=uses_dueling).to(device)
-    weights = get_weights(weights_dir, device)                                        
-    Qnetwork.load_state_dict(weights)
-    Qnetwork.eval()                                                       # Set the network to evaluation mode
+    agent = net(env.observation_space, env.action_space, dueling=uses_dueling).to(device)
+    weights = get_weights_buffer(weights_dir, device, get_buffer=False)  
 
-    pbar = tqdm(range(1, num_test_episodes+1), desc='Testing Episode')
-    for episode in range(num_test_episodes):
+    if weights is not None:                                      
+        agent.load_state_dict(weights)
+    else:
+        raise FileNotFoundError("No file for most recent Q-network weights was found.")
+    
+    agent.eval()                                                                                  # Set the network to evaluation mode
+    env = get_env(vid_dir, game=game, vid_name_prefix=vid_prefix, recording_freq=test_recording_freq)
+    pbar = tqdm(range(1, num_test_episodes+1), desc='Testing')
 
-        episodic_reward = 0
+    for _ in range(num_test_episodes):
+
         state, info = env.reset()
         terminated = False
 
         while not terminated:
+
             # Choose the action with the highest Q-value
-            Qvals = Qnetwork(torch.tensor(state, dtype=torch.float).unsqueeze(0).to(device))
+            Qvals = agent(torch.tensor(state, dtype=torch.float).unsqueeze(0).to(device))
             action = torch.argmax(Qvals, dim=1).cpu().numpy().item()
 
             # Take the chosen action in the environment
             next_state, reward, terminated, trunc, info = env.step(action)
-            episodic_reward += reward
             state = next_state
 
-        pbar.set_postfix(episodic_reward=episodic_reward)
+        pbar.set_postfix(episodic_reward=info["episode"]['r'])
         pbar.update()
-            
+    
     env.close()
+    agent.train()

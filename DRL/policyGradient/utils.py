@@ -1,7 +1,7 @@
 from gymnasium.wrappers import RecordEpisodeStatistics, RecordVideo
-from networks import PolicyNetwork
-from numpy.typing import ArrayLike
-from torch import nn
+from DRL.policyGradient.networks import PolicyNetwork
+from numpy.typing import ArrayLike, NDArray
+from torch import Tensor
 from tqdm import tqdm
 import gymnasium as gym
 import numpy as np
@@ -11,7 +11,7 @@ import time
 import torch
 import warnings
 
-class GAE():
+class GAE:
     """Define a class to compute generalized advantage estimates (GAE).
     
     Attributes:
@@ -46,43 +46,154 @@ class GAE():
         self.γ = gamma
         self.λ = lamb
 
-    def __call__(self, rewards:ArrayLike, state_vals:ArrayLike, dones:ArrayLike) -> ArrayLike:
-        """Compute the advantage estimates, A(s, a), using GAE.
+    def __call__(self, rewards:list, state_vals:list, dones:list) -> ArrayLike:
+        """Compute the advantage estimates, A(s_t, a_t), using GAE. K here denotes 
+        the length of the sampled trajectory.
 
         Parameters:
-            - rewards (ArrayLike; (T, )) : an ArrayLike object containing the rewards
-                                           obtained in the trajectory. Must be of shape
-                                           of shape (T, )
-            - state_vals (ArrayLike; (T+1, )) : an ArrayLike object containing the values
-                                                of the states visted in a trajectory. Must
-                                                be of shape (T+1, ).
-            - dones (ArrayLike; (T, )) : an ArrayLike of boolean values denoting whether the
-                                         visited state was a terminal state or not. Must be 
-                                         of shape (T, ).
+            - rewards (list) : a list containing the rewards obtained in the sampled
+                               trajectory. Must have length K.
+            - state_vals (list) : a list containing the values of the states visted in
+                                  the sampled trajectory. Must have length K+.
+            - dones (list) : a list of boolean values denoting whether the visited state
+                             was terminal or not. Must be of length K.
 
         Returns:
-            - A (ArrayLike; (T, )) : the computed advantages of actions in the given states
-                                     of the trajectory. 
+            - A (ArrayLike; (K, )) : An array of the computed advantages of actions in 
+                                     the given states of the sampled trajectory. It has
+                                     shape (K, )
         """
 
-        T = len(rewards)
+        K = len(rewards)    # Length of trajectory τ
         A = []
         last_adv = 0
 
-        if len(state_vals) != (T+1):
-            raise ValueError(f'Expected state_vals to have shape ({T+1},) but got shape ({len(state_vals)},)')
-        if len(dones) != T:
-            raise ValueError(f"Expected done arrat to have shape ({T+1},) but got shape ({len(dones)},)")
-
-        # Compute A_t = δ_t + γ * λ * A_{t+1}
-        for t in range(T-1, -1, -1):
+        if len(state_vals) != (K+1):
+            raise ValueError(f'Expected state_vals to have shape ({K+1},) but got shape ({len(state_vals)},)')
+        if len(dones) != K:
+            raise ValueError(f"Expected dones to have shape ({K},) but got shape ({len(dones)},)")
+        
+        # Compute A_t = δ_t + γ * λ * A_{t+1}, tϵ{0,...,K-1}
+        for t in range(K-1, -1, -1):
 
             δ = rewards[t] + self.γ * state_vals[t + 1] * (1.0 - dones[t]) - state_vals[t]
             last_adv = δ + self.γ * self.λ * (1.0 - dones[t]) * last_adv
             A += [last_adv]
 
         return np.array(A[::-1])
+    
+class StateNormalizer:
+    """Class to implement Welford's online algorithm for batches of states or a 
+    single state.
 
+    Attributes:
+        - μ : the current sample mean.
+        - σ2 : the current sample variance.
+
+    Hidden Methods:
+        - __init__ : the constructor.
+        - _update : method to update sample mean and variance with new batch.
+        _ __call__ : method to allow class instance to behave like a function.
+    
+    """
+
+    def __init__(self, state_dim:int, ε:float=1e-8) -> None:
+        """Define the current mean, variance, and sample size
+
+        Parameters:
+            - state_dim (int) : the dimension of the state space.
+            - ε (float) : a small value to prevent division by zero when dividing
+                          by the standard deviation. This value also initializes
+                          the initial sample count. 
+        """
+
+        self.μ = np.zeros(state_dim, dtype=np.float64)       
+        self.σ2 = np.ones(state_dim, dtype=np.float64)
+        self.ε = ε
+        self.count = ε  # to avoid division by zero
+
+    def _update(self, states:NDArray) -> None:
+        """Update running mean and variance with new batch of states.
+        
+        Parameters:
+            - states (NDArray) : the new batch of states of the environment to
+                                 use to update the mean and variance. Must be of
+                                 shape (N, state_dim) where N is the batch size.
+
+        Returns:
+            - None
+        """
+
+        if states.ndim != 2:
+            raise TypeError(f"Expected states to have a shape of (N, state_dim) but got shape {states.shape}.")
+
+        batch_mean = states.mean(axis=0)
+        batch_var = states.var(axis=0)
+        batch_count = states.shape[0]
+
+        δ = batch_mean - self.μ
+        total_count = self.count + batch_count
+
+        new_μ = self.μ + δ * batch_count / total_count
+        curr_sum_squares = self.σ2 * self.count
+        batch_sum_squares = batch_var * batch_count
+        M2 = curr_sum_squares + batch_sum_squares + np.square(δ) * self.count * batch_count / total_count
+        new_σ2 = M2 / total_count
+
+        self.μ = new_μ
+        self.σ2 = new_σ2
+        self.count = total_count
+
+    def __call__(self, states:ArrayLike|list[ArrayLike], return_list:bool=True) -> ArrayLike|list[ArrayLike]|NDArray:
+        """Normalize a batch or single state.
+        
+        Parameters:
+            - states (list) : either a singular array representing the state of
+                              the environment or a list of np.ndarray objects 
+                              representing the states of the environment.
+            - return_list (bool) : a boolean indicating whether to return the
+                                   normalized states as a list. Default is
+                                   True. If False, the return type is a NDArray
+                                   object. When a single state is given, the
+                                   return type is an array.
+            
+        Returns:
+            - normalized_states : the normalized state(s) of the environment.
+        """
+        
+        if isinstance(states, list):
+            states = np.array(states)
+            single = False
+        
+        elif isinstance(states, np.ndarray):
+            states = np.array([states])
+            return_list =  False
+            single = True
+
+        else:
+            raise TypeError("Expected states to be either a singular array or a list of arrays.")
+        
+        self._update(states)
+        normalized_states = (states - self.μ) / (np.sqrt(self.σ2) + self.ε)
+
+        if return_list:
+            return list(normalized_states)
+        
+        else:
+
+            if single:
+                return normalized_states[0]
+            else:
+                return normalized_states
+
+def check_nan(module, input, output):
+    """Create a hook in order to inspect if the module is producing NaNs."""
+
+    if torch.isnan(output).any():
+        print(f"NaN detected in {module.__class__.__name__}")
+        print(f"Output: {output}")
+        raise ValueError("NaN produced in forward pass.")
+    
 def get_env(env_name:str, vid_dir:str, vid_name_prefix:str='humanoid-train-video', recording_freq:int=10_000) -> gym.Env:
     """Create chosen robotic environment that allows the recording of the environment 
     at the specified recording frequency. If given env name is not able to created,
@@ -151,10 +262,48 @@ def get_weights(dir:str, device:torch.device) -> dict[str:dict]|None:
 
     return {'actor':actor_weights, 'critic':critic_weights}
 
+def norm_adv(advantages:ArrayLike|Tensor, ε:float=1e-8, return_tensor:bool=False, device:torch.device=None) -> ArrayLike|Tensor:
+    """Normalize the given advantages by subtracting the mean and dividing by the 
+    standard deviation (plus some small value ε).
+
+    Parameters:
+        - advantages (ArrayLike or Tensor) : the advantages to be normalized. It 
+                                             is an array or tensor.
+        - ε (float) : a small value to add to the standard deviation in order
+                      to prevent division by zero.
+        - return_tensor (bool) : a boolean specifying whether to return the 
+                                 given ArrayLike object as tensor. Default is
+                                 False.
+        - device (torch.device): the device tag indicating where to load
+                                 the tensor (if return_tensor is True). Default
+                                 is None.
+    
+    Returns:
+        - (ArrayLike or Tensor) : the normalized input.
+    """
+
+    if isinstance(advantages, np.ndarray):
+
+        if return_tensor:
+
+            tensor = torch.tensor(data=(advantages - advantages.mean()) / (advantages.std(ddof=1) + ε), 
+                                dtype=torch.float32)
+
+            if device is None:
+                return tensor
+            else:
+                return tensor.to(device)
+            
+        else:
+            return (advantages - advantages.mean()) / (advantages.std(ddof=1) + ε)
+    
+    elif isinstance(advantages, torch.Tensor):
+        return (advantages - advantages.mean()) / (advantages.std() + ε)
+
 @torch.no_grad()
 def test_agent(env_name:str, vid_dir:str, weights_dir:str, pol_net:PolicyNetwork, device:torch.device,
-               use_best_action:bool=False, num_test_episodes:int=2, test_recording_freq:int=1, 
-               vid_prefix:str='humanoid-test-video') -> None:
+               hidden_size:int=64, use_best_action:bool=False, num_test_episodes:int=2, 
+               test_recording_freq:int=1, vid_prefix:str='humanoid-test-video') -> None:
     """Test the policy network on a given environment. User can specify 
     whether to use a stochastic or deterministic policy. See parameters 
     below.
@@ -170,6 +319,8 @@ def test_agent(env_name:str, vid_dir:str, weights_dir:str, pol_net:PolicyNetwork
                                     not be an instance but rather the class.
         - device (torch.device): the device tag indicating where to load
                                  the tensor.
+        - hidden_size (int) : the number of neurons to use for the hidden layer
+                              of pol_net. Default is 64.
         - use_best_action (bool) : whether to keep using the learned stochastic
                             policy for testing. If False, the mean of each
                             distribution over the action space will be used,
@@ -190,7 +341,8 @@ def test_agent(env_name:str, vid_dir:str, weights_dir:str, pol_net:PolicyNetwork
     """
 
     env = get_env(env_name, vid_dir, vid_name_prefix=vid_prefix, recording_freq=test_recording_freq)
-    agent = pol_net(state_dim=env.observation_space.shape[0], action_dim=env.action_space.shape[0]).to(device)
+    agent = pol_net(state_dim=env.observation_space.shape[0], action_dim=env.action_space.shape[0],
+                    hidden_size=hidden_size).to(device)
 
     weights = get_weights(dir=weights_dir, device=device)
     if weights is None:

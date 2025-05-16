@@ -74,7 +74,11 @@ My goal is to expand all the way to Rainbow and R2D2.
 * PolicyGrad: I am currently working on bringing a policy gradient lab where students can learn about policy gradients and work up to PPO and SAC.
 So far, I have implemented VPG with GAE and actor-critic (as outlined by OpenAI in [here](https://spinningup.openai.com/en/latest/algorithms/vpg.html)). I will be working towards PPO but placing the motivation from natural gradient $\to$ TRPO $\to$ PPO.
 
-Here are some of my results (GIFs have been slowed down)
+Here are some of my results (GIFs have been slowed down).
+One of main struggles was to get the log-standard deviations and means to not be zero.
+At first, the log-standard devaitions were fixed with clamping as I learned.
+The means took a while but I realized that came from my architecture so I simplified and got the code to work with a small 2-layer MLP of width of 100 neurons.
+I then expended to a 3-layer MLP with a smaller width in the hidden layers. 
 
 Training Episode 0
 
